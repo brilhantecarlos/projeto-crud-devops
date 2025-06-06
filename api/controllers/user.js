@@ -1,57 +1,58 @@
-import { db } from "../db.js";
+import { UserModel } from "../models/user.js";
+import { logger } from "../logger.js";
 
-export const getUsers = (_, res) => {
-  const q = "SELECT * FROM usuarios";
-
-  db.query(q, (err, data) => {
-    if (err) return res.json(err);
-
+export const getUsers = (req, res, next) => {
+  UserModel.getAll((err, data) => {
+    if (err) {
+      logger.error(`Erro ao buscar usuários: ${err.message}`);
+      return next(err);
+    }
+    logger.info("Usuários listados com sucesso");
     return res.status(200).json(data);
   });
 };
 
-export const addUser = (req, res) => {
-  const q =
-    "INSERT INTO usuarios(`nome`, `email`, `fone`, `data_nascimento`) VALUES(?)";
-
+export const addUser = (req, res, next) => {
   const values = [
     req.body.nome,
     req.body.email,
     req.body.fone,
     req.body.data_nascimento,
   ];
-
-  db.query(q, [values], (err) => {
-    if (err) return res.json(err);
-
+  UserModel.add(values, (err) => {
+    if (err) {
+      logger.error(`Erro ao criar usuário: ${err.message}`);
+      return next(err);
+    }
+    logger.info("Usuário criado com sucesso");
     return res.status(200).json("Usuário criado com sucesso.");
   });
 };
 
-export const updateUser = (req, res) => {
-  const q =
-    "UPDATE usuarios SET `nome` = ?, `email` = ?, `fone` = ?, `data_nascimento` = ? WHERE `id` = ?";
-
+export const updateUser = (req, res, next) => {
   const values = [
     req.body.nome,
     req.body.email,
     req.body.fone,
     req.body.data_nascimento,
   ];
-
-  db.query(q, [...values, req.params.id], (err) => {
-    if (err) return res.json(err);
-
+  UserModel.update(values, req.params.id, (err) => {
+    if (err) {
+      logger.error(`Erro ao atualizar usuário: ${err.message}`);
+      return next(err);
+    }
+    logger.info("Usuário atualizado com sucesso");
     return res.status(200).json("Usuário atualizado com sucesso.");
   });
 };
 
-export const deleteUser = (req, res) => {
-  const q = "DELETE FROM usuarios WHERE `id` = ?";
-
-  db.query(q, [req.params.id], (err) => {
-    if (err) return res.json(err);
-
+export const deleteUser = (req, res, next) => {
+  UserModel.delete(req.params.id, (err) => {
+    if (err) {
+      logger.error(`Erro ao deletar usuário: ${err.message}`);
+      return next(err);
+    }
+    logger.info("Usuário deletado com sucesso");
     return res.status(200).json("Usuário deletado com sucesso.");
   });
 };

@@ -1,20 +1,29 @@
 // Modelo de usuário para separar a lógica de acesso ao banco
-import { db } from "../db.js";
+import { UserRepository } from "../repositories/userRepository.js";
 
 export const UserModel = {
   getAll: (callback) => {
-    db.query("SELECT * FROM usuarios", callback);
+    UserRepository.ensureTableExists((err) => {
+      if (err) return callback(err);
+      UserRepository.getAll(callback);
+    });
   },
   add: (values, callback) => {
-    const q = "INSERT INTO usuarios(`nome`, `email`, `fone`, `data_nascimento`) VALUES(?)";
-    db.query(q, [values], callback);
+    UserRepository.ensureTableExists((err) => {
+      if (err) return callback(err);
+      UserRepository.add(values, callback);
+    });
   },
   update: (values, id, callback) => {
-    const q = "UPDATE usuarios SET `nome` = ?, `email` = ?, `fone` = ?, `data_nascimento` = ? WHERE `id` = ?";
-    db.query(q, [...values, id], callback);
+    UserRepository.ensureTableExists((err) => {
+      if (err) return callback(err);
+      UserRepository.update(values, id, callback);
+    });
   },
   delete: (id, callback) => {
-    const q = "DELETE FROM usuarios WHERE `id` = ?";
-    db.query(q, [id], callback);
+    UserRepository.ensureTableExists((err) => {
+      if (err) return callback(err);
+      UserRepository.delete(id, callback);
+    });
   }
 };

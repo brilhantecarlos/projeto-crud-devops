@@ -2,6 +2,7 @@ services:
   db:
     image: mysql:8.0
     restart: always
+    command: --default-authentication-plugin=mysql_native_password
     container_name: api_database
     environment:
       MYSQL_ROOT_PASSWORD: adsdev123
@@ -36,6 +37,7 @@ services:
   frontend:
     build: ./frontend
     restart: always
+    container_name: frontend
     ports:
       - "3000:80"
     networks:
@@ -43,5 +45,6 @@ services:
     depends_on:
       - api
 
-volumes:
-  db_data:
+networks:
+  app-users:
+    driver: bridge
